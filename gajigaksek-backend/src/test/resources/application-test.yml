@@ -1,0 +1,63 @@
+spring:
+  #  datasource:
+  #    url: jdbc:tc:mysql:8.0.23:///?rewriteBatchedStatements=true&profileSQL=true&logger=Slf4JLogger&maxQuerySizeToLog=999999
+  #    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+  #    username:
+  #    password:
+  #    hikari:
+  #      maximum-pool-size: 5
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+    hikari:
+      jdbc-url: jdbc:h2:mem://localhost/~/testdb;MODE=MYSQL
+  sql:
+    init:
+      data-locations: classpath:data.sql
+      username:
+      password:
+      mode: never
+
+  jpa:
+    defer-datasource-initialization: true
+    # database-platform: org.hibernate.dialect.MySQL8Dialect
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate.default_batch_fetch_size: 1000
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        format_sql: true
+    open-in-view: false
+
+  redis:
+    lettuce:
+      pool:
+        min-idle: 0
+        max-idle: 8
+        max-active: 8
+    port: 16379
+    host: localhost
+
+  flyway:
+    enabled: false
+
+decorator:
+  datasource:
+    p6spy:
+      enable-logging: true
+
+# for using korean words
+server:
+  servlet:
+    encoding:
+      charset: utf-8
+      force: true
+      enabled: true
+
+#logging:
+#  level:
+#    com.zaxxer.hikari.HikariConfig: DEBUG
+#    com.zaxxer.hikari: TRACE

@@ -1,0 +1,237 @@
+spring:
+  profiles:
+    active: dev
+
+  social:
+    kakao:
+      profile: https://kapi.kakao.com/v2/user/me
+      image_url: http://k.kakaocdn.net
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+
+cloud:
+  aws:
+    s3:
+      bucket: gajigaksaek-bucket
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
+    credentials:
+      accessKey: 삭제
+      secretKey: 삭제
+
+jwt:
+  type: Bearer
+  header: Authorization
+  # HS512 algorithm -> must larger than 64Byte
+  # base64 encoding
+  secret: 삭제
+
+fcm:
+  key:
+    path: 삭제
+    scope: https://www.googleapis.com/auth/cloud-platform
+
+# iamport
+iamport:
+  apiKey: 삭제
+  apiSecret: 삭제
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+
+  # AWS RDS(MySQL / Aurora)
+  datasource:
+    url: jdbc:mysql://gjgs-1.cvowj9xkrrgz.ap-northeast-2.rds.amazonaws.com:3306/gjgs?rewriteBatchedStatements=true
+    #     MySQL / Read Replica
+    slave-list:
+      - name: slave_1
+        url: jdbc:mysql://gjgs-read-replica1.cvowj9xkrrgz.ap-northeast-2.rds.amazonaws.com:3306/gjgs?rewriteBatchedStatements=true
+      - name: slave_2
+        url: jdbc:mysql://gjgs-read-replica2.cvowj9xkrrgz.ap-northeast-2.rds.amazonaws.com:3306/gjgs?rewriteBatchedStatements=true
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: 삭제
+    password: 삭제
+
+
+  jpa:
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate.default_batch_fetch_size: 1000
+    open-in-view: false
+
+  redis:
+    pool:
+      min-idle: 0
+      max-idle: 8
+      max-active: 8
+    cluster:
+      nodes:
+        - 10.0.5.234:5001
+        - 10.0.6.23:5001
+        - 10.0.5.7:5001
+    password: 삭제
+
+  elasticsearch:
+    rest:
+      username: 삭제
+      password: 삭제
+      uris:
+        - 10.0.7.8:9200
+        - 10.0.7.190:9200
+        - 10.0.7.46:9200
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    baseline-version: 1
+    url: jdbc:mysql://gjgs-1.cvowj9xkrrgz.ap-northeast-2.rds.amazonaws.com:3306/gjgs?rewriteBatchedStatements=true
+    user: 삭제
+    password: 삭제
+
+decorator:
+  datasource:
+    p6spy:
+      enable-logging: false
+
+logging:
+  file:
+    name: logs/error.log
+  pattern:
+    file: "[%d{yyyy-MM-dd HH:mm:ss}][%-5level][%logger.%method:line%line] - %msg%n"
+  level:
+    root: error
+  logback:
+    rollingpolicy:
+      max-file-size: 50MB
+      max-history: 14
+      total-size-cap: 1GB
+      file-name-pattern: "/logs/error.%d{yyyy-MM-dd}_%i.log"
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+  h2:
+    console:
+      enabled: true
+
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  sql:
+    init:
+      data-locations: classpath:data.sql
+      username: sa
+      password:
+      mode: always
+
+  jpa:
+    defer-datasource-initialization: true
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate.default_batch_fetch_size: 1000
+    open-in-view: false
+
+  redis:
+    pool:
+      min-idle: 0
+      max-idle: 8
+      max-active: 8
+    port: 6379
+    host: localhost
+
+  elasticsearch:
+    rest:
+      username: 삭제
+      password: 삭제
+      uris:
+        - 127.0.0.1:9200
+  flyway:
+    enabled: false
+
+decorator:
+  datasource:
+    p6spy:
+      enable-logging: true
+
+
+# for using korean words
+server:
+  servlet:
+    encoding:
+      charset: utf-8
+      force: true
+      enabled: true
+
+# elasticsearch
+
+logging:
+  level:
+    #    org.hibernate.SQL: debug
+    #    org.hibernate.type: trace
+    # for jdbc native
+    org.springframework.jdbc.core.JdbcTemplate: DEBUG
+    org.springframework.jdbc.core.StatementCreatorUtils: TRACE
+
+---
+# 로컬환경 == DB를 내 컴퓨터에 있는 MySQL을 사용
+spring:
+  config:
+    activate:
+      on-profile: local
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/gjgs?rewriteBatchedStatements=true
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: 삭제
+    password: 삭제
+
+  jpa:
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    open-in-view: false
+    show-sql: true
+    generate-ddl: false
+    hibernate:
+      format_sql: true
+      ddl-auto: validate
+    properties:
+      hibernate.default_batch_fetch_size: 1000
+
+  redis:
+    pool:
+      min-idle: 0
+      max-idle: 8
+      max-active: 8
+    port: 6379
+    host: localhost
+
+  elasticsearch:
+    rest:
+      username: 삭제
+      password: 삭제
+      uris:
+        - 127.0.0.1:9200
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    baseline-version: 1
+    url: jdbc:mysql://localhost:3306/gjgs?rewriteBatchedStatements=true
+    user: 삭제
+    password: 삭제
