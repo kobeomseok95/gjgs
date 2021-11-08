@@ -557,7 +557,7 @@
 
 # 🔨Test <a name = "test"></a>
 
-## Unit Test & Commit
+## Unit Test
 <div align="center">
  <img src="/images/test.PNG" alt="test">
 </div>
